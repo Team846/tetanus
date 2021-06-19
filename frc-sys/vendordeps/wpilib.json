@@ -1,0 +1,11 @@
+{
+    "mavenUrl": "https://frcmaven.wpi.edu/artifactory/release/",
+    "version": "2021.3.1",
+    "dependencies": [
+        "hal",
+        "ntcore",
+        "wpilibc",
+        "wpimath",
+        "wpiutil"
+    ]
+}
