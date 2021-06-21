@@ -27,7 +27,7 @@ toolchain/*
 frc-sys/include/*
 !frc-sys/include/.gitkeep
 frc-sys/lib/*
-!frc-sys/lib/roborio/
+!frc-sys/lib/.gitkeep
 
 ##### Editors
 .vscode/

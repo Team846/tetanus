@@ -2,7 +2,7 @@
 target = "arm-unknown-linux-gnueabi"
 
 [target.arm-unknown-linux-gnueabi]
-linker = "../toolchain/roborio/bin/arm-frc2021-linux-gnueabi-gcc"
+linker = "toolchain/roborio/bin/arm-frc2021-linux-gnueabi-gcc"
 rustflags = [
   "-C", "target-cpu=cortex-a9"
 ]
