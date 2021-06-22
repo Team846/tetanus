@@ -2,6 +2,7 @@
 extern crate lazy_static;
 
 use bindgen::Builder;
+use bindgen::EnumVariation;
 use cc::Build;
 use chrono::Local;
 use std::env;
@@ -158,6 +159,9 @@ fn generate_bindings(module: &str, builder: Builder) {
 
     let mut builder = builder
         .header(header.to_str().unwrap())
+        .default_enum_style(EnumVariation::Rust {
+            non_exhaustive: false,
+        })
         .layout_tests(false) // Don't generate memory layout tests
         .opaque_type("std::.*") // Treat std types as opaque
         .clang_arg("-xc++") // Enable C++ header mode
