@@ -5,3 +5,4 @@ pub mod pwm;
 pub mod robot_base;
 pub mod robot_controller;
 pub mod servo;
+pub mod talon_fx;

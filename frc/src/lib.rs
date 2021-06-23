@@ -10,4 +10,9 @@ pub mod hal {
     pub use frc_sys::hal::*;
 }
 
+// // Rust bindings to CTRE
+// pub mod ctre {
+//     pub use frc_sys::ctre::*;
+// }
+
 pub use frc_sys;

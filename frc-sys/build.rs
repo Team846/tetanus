@@ -84,6 +84,15 @@ fn main() {
             .allowlist_var("HAL_.*"),
     );
 
+    // Generate CTRE bindings
+    generate_bindings(
+        "ctre",
+        Builder::default()
+            .allowlist_type("ctre::.*")
+            .allowlist_function("ctre::.*")
+            .allowlist_var("ctre::.*"),
+    );
+
     // Generate wpilib bindings
     generate_bindings(
         "wpilib",
