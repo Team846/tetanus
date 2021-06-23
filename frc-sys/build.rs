@@ -128,7 +128,7 @@ fn compile_cc(name: &str) {
     let source = PathBuf::from("wrappers").join(format!("{}.cc", name));
 
     // Rerun build if source changes
-    println!("cargo:rerun-if-change={}", source.to_str().unwrap());
+    println!("cargo:rerun-if-changed={}", source.to_str().unwrap());
 
     let mut build = Build::new();
     build

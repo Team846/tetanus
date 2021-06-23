@@ -3,4 +3,11 @@
 #![allow(rustdoc::broken_intra_doc_links)]
 
 pub mod wpilib;
-pub use frc_sys::hal;
+
+/// Rust bindings to HAL
+pub mod hal {
+    // Re-export frc_sys::hal since there's no need to write friendly wrappers around HAL functions
+    pub use frc_sys::hal::*;
+}
+
+pub use frc_sys;

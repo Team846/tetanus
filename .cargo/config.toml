@@ -6,3 +6,13 @@ linker = "toolchain/roborio/bin/arm-frc2021-linux-gnueabi-gcc"
 rustflags = [
   "-C", "target-cpu=cortex-a9"
 ]
+
+[profile.release]
+# Default opt-level for release is 3 but causes a segfault with a mutex in wpilib
+#
+# gdb output:
+# 0xb6f07f18 in frc::MotorSafety::Check() () from target:/usr/local/frc/third-party/lib/libwpilibc.so
+#
+# Lowering the opt-level to 1 seems to fix this (2 and 3 result in same segfault)
+# Is this a good solution? no.
+opt-level = 1
