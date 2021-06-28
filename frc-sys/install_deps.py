@@ -4,6 +4,8 @@
 
 Compiled libraries and headers are downloaded from each vendor's maven repository linked in
 vendordeps JSON files.
+
+See vendordeps/README.md
 """
 
 from datetime import datetime
@@ -16,19 +18,17 @@ import shutil
 import sys
 from urllib import request
 
-VENDORDEPS_DIR = "vendordeps"
+VENDOR_DEPS_DIR = "vendordeps"
+WPILIB_DEPS_DIR = "vendordeps/wpilib"
+
 INCLUDE_DIR = "include"
 LIB_DIR = "lib"
-
-WPILIB_DEP = "wpilib"
-ROBORIO_DEP = "roborio"
-VENDOR_DEPS = ["navx_frc", "Phoenix-latest", "REVColorSensorV3", "REVRobotics"]
 
 
 def main():
     # Clean include and lib directories before downloading new deps
     for dir in [INCLUDE_DIR, LIB_DIR]:
-        # Delete all contents except hidden files (doesn't delete .gitkeep)
+        # Delete all contents except hidden files (except .gitkeep)
         for f in os.listdir(dir):
             if f == ".gitkeep":
                 continue
@@ -39,47 +39,34 @@ def main():
             else:
                 shutil.rmtree(p)
 
-    # Download all wpilib deps
-    with open(path.join(VENDORDEPS_DIR, f"{WPILIB_DEP}.json"), 'r') as wpilib_dep_file:
-        j = json.load(wpilib_dep_file)
-        for dep in j['dependencies']:
-            install_dep(
-                'wpilib',
-                j['mavenUrl'],
-                f"edu.wpi.first.{dep}",
-                f"{dep}-cpp",
-                j['version'],
-                static=False,
-                headers=True,
-            )
+    # Download wpilib related deps
+    for vendordep in glob(path.join(WPILIB_DEPS_DIR, "*.json")):
+        with open(vendordep, 'r') as f:
+            j = json.load(f)
+            for dep in j['dependencies']:
+                # Files usually located in /<dep>/<dep>-<cpp>, except for ni-libraries
+                group_id = dep if j['name'] != "ni-libraries" else ""
+                artifact_id = f"{dep}-cpp" if j['name'] != "ni-libraries" else dep
 
-    # Download all roborio runtime dpes
-    with open(path.join(VENDORDEPS_DIR, f"{ROBORIO_DEP}.json"), 'r') as roborio_dep_file:
-        j = json.load(roborio_dep_file)
-        for dep in j['dependencies']:
-            install_dep(
-                dep['name'],
-                j['mavenUrl'],
-                "",
-                dep['name'],
-                dep['version'],
-                static=False,
-                headers=False,
-            )
+                install_dep(
+                    j['mavenUrl'],
+                    group_id,
+                    artifact_id,
+                    j['version'],
+                    static=False,
+                    headers=j['headers'],
+                )
 
-    # Download all vendor deps
-    for vendor_dep in VENDOR_DEPS:
-        with open(path.join(VENDORDEPS_DIR, f"{vendor_dep}.json"), 'r') as vendordep_file:
-            j = json.load(vendordep_file)
-
+    # Download vendor dependencies
+    for vendordep in glob(path.join(VENDOR_DEPS_DIR, "*.json")):
+        with open(vendordep, 'r') as f:
+            j = json.load(f)
             for dep in j['cppDependencies']:
                 # Skip dependencies that arent compiled for roborio (probably simulation stuff)
                 if "linuxathena" not in dep['binaryPlatforms']:
-                    # print(f"Skipping {dep['groupId']}-{dep['artifactId']}")
                     continue
 
                 install_dep(
-                    j['name'],
                     j['mavenUrls'][0],
                     dep['groupId'],
                     dep['artifactId'],
@@ -90,9 +77,12 @@ def main():
 
     full_lib_dir = path.join(LIB_DIR, "linux", "athena", "shared")
 
-    # Delete debug versions (e.g. libwpilibc.so.debug)
-    for f in glob(path.join(full_lib_dir, f"*.debug")):
-        os.remove(f)
+    # Rename debug versions (e.g. libwpilibc.so.debug -> libwpilibcd.so)
+    r = re.compile('(.*)\.so\.debug')
+    for f in os.listdir(full_lib_dir):
+        m = r.match(f)
+        if m:
+            os.rename(path.join(full_lib_dir, f), path.join(full_lib_dir, f"{m.group(1)}d.so"))
 
     # Create symlinks to shared libraries with version numbers (e.g. libNiFpga.so -> libNiFpga.so.19.0.0)
     r = re.compile('(.*\.so)\..*')
@@ -103,7 +93,7 @@ def main():
 
     # Delete misc files (notices, licenses, etc.)
     for dir in [INCLUDE_DIR, LIB_DIR]:
-        for g in ["LICENSE.*", "RequiredVersion.txt", "ThirdPartyNotices.txt"]:
+        for g in ["LICENSE*", "RequiredVersion.txt", "ThirdPartyNotices.txt"]:
             for f in glob(path.join(dir, g)):
                 os.remove(f)
 
@@ -113,7 +103,7 @@ def main():
             f.write(f"Files downloaded by ../install_deps.py on {datetime.now()}")
 
 
-def install_dep(vendor_name, maven_url, group_id, artifact_id, version, static, headers):
+def install_dep(maven_url, group_id, artifact_id, version, static, headers):
     """Download a dependency headers and static library."""
 
     url = urljoin(maven_url, group_id.replace('.', '/'), artifact_id, version)
@@ -144,7 +134,9 @@ def download_and_unzip(url, dir, name):
 
 
 def urljoin(*components):
-    """Join url pieces together."""
+    """Join url path components together."""
+
+    components = filter(lambda c: c, components)
     return '/'.join([c.strip('/') for c in components])
 
 

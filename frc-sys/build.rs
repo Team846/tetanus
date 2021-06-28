@@ -20,12 +20,17 @@ const STATIC_LIBS: &[&str] = &[
     "SparkMaxDriver",
 ];
 
-const SHARED_LIBS: &[&str] = &[
+const WPILIB_LIBS: &[&str] = &[
     "wpilibc",
     "ntcore",
     "wpiHal",
     "wpiutil",
     "wpimath",
+    "cameraserver",
+    "cscore",
+];
+
+const SHARED_LIBS: &[&str] = &[
     "RoboRIO_FRC_ChipObject",
     "FRC_NetworkCommunication",
     "visa",
@@ -37,7 +42,22 @@ const SHARED_LIBS: &[&str] = &[
     "niriodevenum",
     "NiFpgaLv",
     "niriosession",
-    "cameraserver",
+    "opencv_stitching",
+    "opencv_videoio",
+    "opencv_flann",
+    "opencv_video",
+    "opencv_imgcodecs",
+    "opencv_highgui",
+    "opencv_objdetect",
+    "opencv_imgproc",
+    "opencv_calib3d",
+    "opencv_core",
+    "opencv_features2d",
+    "opencv_photo",
+    "opencv_ml",
+    "opencv_shape",
+    "opencv_superres",
+    "opencv_videostab",
 ];
 
 // Path to libraries
@@ -101,26 +121,34 @@ fn main() {
             .blocklist_function("wpi::.*"),
     );
 
+    // Search for libraries
+    for i in &["static", "shared"] {
+        println!(
+            "cargo:rustc-link-search={}",
+            CWD.join(LIB_DIR).join(i).to_str().unwrap(),
+        );
+    }
+
     // Link with static libraries
-    println!(
-        "cargo:rustc-link-search={}",
-        CWD.join(LIB_DIR).join("static").to_str().unwrap(),
-    );
     for lib in STATIC_LIBS {
         println!("cargo:rustc-link-lib={}", lib);
     }
 
-    // Link with shared libraries
-    println!(
-        "cargo:rustc-link-search={}",
-        CWD.join(LIB_DIR).join("shared").to_str().unwrap(),
-    );
+    // Link with wpilib libraries
+    let is_debug = env::var("PROFILE").unwrap() == "debug";
+    for lib in WPILIB_LIBS {
+        // Debug versions of wpilib libraries are postfixed with "d"
+        if is_debug {
+            println!("cargo:rustc-link-lib={}d", lib)
+        } else {
+            println!("cargo:rustc-link-lib={}", lib)
+        }
+    }
+
+    // Link with other shared libraries
     for lib in SHARED_LIBS {
         println!("cargo:rustc-link-lib={}", lib)
     }
-
-    // Link with stdc++
-    println!("cargo:rustc-link-lib=stdc++");
 }
 
 fn compile_cc(name: &str) {

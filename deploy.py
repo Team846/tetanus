@@ -2,17 +2,16 @@
 
 """Deploy executable and libraries to the roborio.
 
-After compiling the robot package, this script finds the roborio address, copies over the executable
-and wpilib libraries, and runs several scripts remotely.
+Referenced off of gradlerio (download an example C++ project and run gradle deploy to see the logs)
 
 positional arguments:
   package            robot package to deploy
 
 optional arguments:
   -h, --help         show this help message and exit
-  --verbose, -v      log shell commands
-  --skip-wpilib, -s  skip deploying wpilib libraries
-  --build, -b        run cargo build automatically before deploying
+  --skip-libs, -s    skip deploying shared libraries
+  --build, -b        run cargo build before deploying
+  --debug, -d        don't add --release flag to cargo build
 
 e.g. `./deploy.py rswerve -sb` build and deploys the rswerve package, skipping wpilib libraries
 """
@@ -22,16 +21,36 @@ import subprocess
 import sys
 from os import path
 
-EXECUTABLE_DIR = "target/arm-unknown-linux-gnueabi/release"
+EXECUTABLE_DIR = "target/arm-unknown-linux-gnueabi"
 SHARED_LIB_DIR = "frc-sys/lib/linux/athena/shared"
 
 WPILIB_LIBS = [
     "cameraserver",
+    "cscore",
     "ntcore",
     "wpiHal",
     "wpilibc",
     "wpimath",
     "wpiutil",
+]
+
+THIRD_PARTY_LIBS = [
+    "opencv_stitching",
+    "opencv_videoio",
+    "opencv_flann",
+    "opencv_video",
+    "opencv_imgcodecs",
+    "opencv_highgui",
+    "opencv_objdetect",
+    "opencv_imgproc",
+    "opencv_calib3d",
+    "opencv_core",
+    "opencv_features2d",
+    "opencv_photo",
+    "opencv_ml",
+    "opencv_shape",
+    "opencv_superres",
+    "opencv_videostab",
 ]
 
 ROBORIO_HOME_DIR = "/home/lvuser/"
@@ -48,44 +67,68 @@ def main():
 
     parser = ArgumentParser(description="Deploy code to the roborio.")
     parser.add_argument("package", type=str, help="robot package to deploy")
-    parser.add_argument("--verbose", "-v", action="store_true", help="log shell commands")
-    parser.add_argument("--skip-wpilib", "-s", action="store_true",
-                        help="skip deploying wpilib libraries")
+    parser.add_argument("--skip-libs", "-s", action="store_true",
+                        help="skip deploying shared libraries")
     parser.add_argument("--build", "-b", action="store_true",
-                        help="run cargo build automatically before deploying")
+                        help="run cargo build before deploying")
+    parser.add_argument("--debug", "-d", action="store_true",
+                        help="don't add --release flag to cargo build")
     args = parser.parse_args()
 
+    #####
+
+    # run cargo build, unless -b is passed
     if args.build:
-        build_package()
+        cmd(f"cargo build -p {args.package} {'' if args.debug else '--release'}",
+            suppress=False)
 
-    verify_executable()
-    address = find_roborio()
+    print(f"\n\nDeploying {args.package}")
+    print("(C: running command on robot, F: copying file to robot)\n\n")
 
-    if not args.skip_wpilib:
-        deploy_wpilib_libs()
+    # path to executable
+    exe = path.join(EXECUTABLE_DIR, "debug" if args.debug else "release", args.package)
 
-    run_predeploy()
-    deploy_executable()
-    run_postdeploy()
-
-
-def build_package():
-    """Run cargo build --release on the robot package."""
-
-    print(f"Building {args.package}")
-    cmd(f"cargo build -p {args.package} --release", suppress=False)
-
-
-def verify_executable():
-    """Verify that the robot executable exists.
-
-    The robot package must be built in the release profile.
-    """
-
-    exe = path.join(EXECUTABLE_DIR, args.package)
+    # verify executable exists
     if not path.exists(exe):
         sys.exit(f"Robot executable {exe} not found.")
-    print(f"Executable found at {exe}")
+
+    # find roborio address
+    address = find_roborio()
+
+    cmd_ssh("sed -i -e 's/^StartupDLLs/;StartupDLLs/' /etc/natinst/share/ni-rt.ini")
+
+    # deploy shared libraries, unless -s is passed
+    if not args.skip_libs:
+        for lib in WPILIB_LIBS:
+            if args.debug:
+                f = path.join(SHARED_LIB_DIR, f"lib{lib}d.so")
+            else:
+                f = path.join(SHARED_LIB_DIR, f"lib{lib}.so")
+            scp(f, ROBORIO_LIB_DIR)
+
+        for lib in THIRD_PARTY_LIBS:
+            scp(path.join(SHARED_LIB_DIR, f"lib{lib}.so"), ROBORIO_LIB_DIR)
+
+        cmd_ssh("chmod -R 777 \"/usr/local/frc/third-party/lib\" || true; chown -R lvuser:ni \"/usr/local/frc/third-party/lib\"")
+        cmd_ssh("ldconfig")
+
+    # kill robot and delete previous executable on robot
+    cmd_ssh(". /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t 2> /dev/null")
+    cmd_ssh("rm -f \"/home/lvuser/frcUserProgram\"")
+
+    # copy new executable to robot (named frcUserProgram)
+    scp(exe, path.join(ROBORIO_HOME_DIR, "frcUserProgram"))
+
+    cmd_ssh("echo ' \"/home/lvuser/frcUserProgram\" ' > /home/lvuser/robotCommand")
+    cmd_ssh("chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand")
+    cmd_ssh("chmod +x /home/lvuser/frcUserProgram; chown lvuser /home/lvuser/frcUserProgram")
+    cmd_ssh("chmod +x \"/home/lvuser/frcUserProgram\"; chown lvuser \"/home/lvuser/frcUserProgram\"")
+    cmd_ssh("setcap cap_sys_nice+eip \"/home/lvuser/frcUserProgram\"")
+    cmd_ssh("sync")
+    cmd_ssh("ldconfig")
+    cmd_ssh(". /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t -r 2> /dev/null")
+
+    print("\n\nDone")
 
 
 def find_roborio():
@@ -102,8 +145,7 @@ def find_roborio():
 
     for address in addresses:
         print(f"Pinging {address}... ", end="", flush=True)
-        ping = cmd(f"ping -c 1 {address}")
-        if ping.returncode == 0:
+        if cmd(f"ping -c 1 {address}"):
             print("Success")
             return address
         else:
@@ -112,84 +154,33 @@ def find_roborio():
     sys.exit("Unable to connect to roborio.")
 
 
-def deploy_wpilib_libs():
-    """Copies wpilib libraries to the roborio."""
-
-    for lib in WPILIB_LIBS:
-        f = path.join(SHARED_LIB_DIR, f"lib{lib}.so")
-        print(f"Deploying vendor library: {f}")
-        scp(f, ROBORIO_LIB_DIR)
-
-
-def run_predeploy():
-    """Run predeploy scripts on the roborio.
-
-    Based on https://github.com/wpilibsuite/GradleRIO/blob/HEAD/src/main/groovy/edu/wpi/first/gradlerio/frc/FRCNativeArtifact.groovy
-    """
-
-    print("Running predeploy scripts")
-    commands = [
-        ". /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t 2> /dev/null",
-        f"rm -f {path.join(ROBORIO_HOME_DIR, args.package)}"
-    ]
-
-    for c in commands:
-        cmd_ssh(c)
-
-
-def deploy_executable():
-    """Copies the robot executable to the roborio."""
-
-    f = path.join(EXECUTABLE_DIR, args.package)
-    print(f"Deploying executable: {f}")
-    cmd_ssh([f"rm -f /home/lvuser/{args.package}"])
-    scp(f, ROBORIO_HOME_DIR)
-
-
-def run_postdeploy():
-    """Runs postdeploy scripts on the roborio.
-
-    Based on https://github.com/wpilibsuite/GradleRIO/blob/HEAD/src/main/groovy/edu/wpi/first/gradlerio/frc/FRCNativeArtifact.groovy
-
-    Also updates the robotCommand file in the roborio.
-    """
-
-    print("Running postdeploy scripts")
-    file = path.join(ROBORIO_HOME_DIR, args.package)
-    commands = [
-        f"echo \"{file}\" > /home/lvuser/robotCommand",
-        "chmod +x /home/lvuser/robotCommand; chown lvuser /home/lvuser/robotCommand",
-        f"chmod +x {file}; chown lvuser {file}",
-        "sync",
-        "ldconfig",
-        ". /etc/profile.d/natinst-path.sh; /usr/local/frc/bin/frcKillRobot.sh -t -r 2> /dev/null"
-    ]
-
-    for c in commands:
-        cmd_ssh(c)
-
-
 def cmd_ssh(command):
     """Run a command on the roborio."""
 
-    cmd(f"ssh admin@{address} '{command}'")
+    print(f"C: {command}")
+    cmd(f"ssh admin@{address} \"{command}\"")
 
 
 def scp(source, target):
     """Copy files from local to the roborio."""
 
+    print(f"F: {source} -> {target}")
     cmd(f"scp {source} admin@{address}:{target}")
 
 
 def cmd(command, suppress=True):
-    """Run a command (suppresses output)."""
+    """Run a command."""
 
-    if args.verbose:
-        print(command)
     if suppress:
-        return subprocess.run(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        result = subprocess.run(command, shell=True,
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
-        return subprocess.run(command, shell=True)
+        result = subprocess.run(command, shell=True)
+
+    if result.returncode != 0:
+        sys.exit(f"Previous command exited with code {result.returncode}")
+
+    return result
 
 
 if __name__ == "__main__":

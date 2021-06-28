@@ -1,0 +1,12 @@
+{
+    "name": "ni-libraries",
+    "mavenUrl": "https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/ni-libraries/",
+    "headers": false,
+    "version": "2020.10.1",
+    "dependencies": [
+        "chipobject",
+        "netcomm",
+        "runtime",
+        "visa"
+    ]
+}

@@ -1,8 +1,11 @@
 {
-    "mavenUrl": "https://frcmaven.wpi.edu/artifactory/release/",
+    "name": "wpilib",
+    "mavenUrl": "https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first",
+    "headers": true,
     "version": "2021.3.1",
     "dependencies": [
         "cameraserver",
+        "cscore",
         "hal",
         "ntcore",
         "wpilibc",

@@ -1,0 +1,9 @@
+{
+    "name": "opencv",
+    "mavenUrl": "https://frcmaven.wpi.edu/artifactory/release/edu/wpi/first/thirdparty/frc2021",
+    "headers": false,
+    "version": "3.4.7-5",
+    "dependencies": [
+        "opencv"
+    ]
+}
