@@ -2,5 +2,5 @@
 members = [
     "frc-sys",
     "frc",
-    "rswerve"
+    "rswerve",
 ]
