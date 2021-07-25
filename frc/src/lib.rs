@@ -2,6 +2,7 @@
 
 #![allow(rustdoc::broken_intra_doc_links)]
 
+pub mod ctre;
 pub mod wpilib;
 
 /// Rust bindings to HAL

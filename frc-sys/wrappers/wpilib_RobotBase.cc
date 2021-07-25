@@ -1,11 +1,3 @@
-/*
- * Copy of RunRobot and StartRobot in frc/RobotBase.h with changes to make rust bindings friendlier.
- * 
- * Instead of wpilib's c++ way of creating a subclass of RobotBase and passing it as a template to
- * RunRobot and StartRobot, StartRobotRs takes in start_competition and end_competition as rust
- * function pointers. The rust functions are used to create RobotBaseRs.
- */
-
 #include "wpilib.h"
 
 #include <frc/RobotBase.h>

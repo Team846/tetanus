@@ -94,6 +94,15 @@ fn main() {
     // Compile wpilib_RobotBase extension
     compile_cc("wpilib_RobotBase");
 
+    // Generate ctre bindings
+    generate_bindings(
+        "ctre",
+        Builder::default()
+            .allowlist_type("ctre::.*")
+            .allowlist_function("ctre::.*")
+            .allowlist_var("ctre::.*"),
+    );
+
     // Generate HAL bindings
     generate_bindings(
         "hal",
