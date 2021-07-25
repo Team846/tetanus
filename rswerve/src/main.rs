@@ -1,6 +1,6 @@
 use frc::hal;
 use frc::wpilib::robot_controller;
-use frc::wpilib::servo::Servo;
+use frc::wpilib::Servo;
 use frc::wpilib::{driver_station, robot_base::start_robot};
 use uom::si::angle::degree;
 use uom::si::f64::*;

@@ -10,5 +10,3 @@ pub mod hal {
     // Re-export frc_sys::hal since there's no need to write friendly wrappers around HAL functions
     pub use frc_sys::hal::*;
 }
-
-pub use frc_sys;
