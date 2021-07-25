@@ -1,5 +1,5 @@
 [package]
-name = "rswerve"
+name = "r2021-swerve"
 version = "0.1.0"
 authors = ["Andrew (Andy) Min <me@andrewmin.info>"]
 edition = "2018"
