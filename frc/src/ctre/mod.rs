@@ -3,6 +3,7 @@
 use frc_sys::ctre::ctre_phoenix_ErrorCode;
 
 pub mod motorcontrol;
+pub mod sensors;
 
 pub type ErrorCode = ctre_phoenix_ErrorCode;
 
