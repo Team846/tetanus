@@ -130,6 +130,16 @@ fn main() {
             .blocklist_function("wpi::.*"),
     );
 
+    //Generate rev bindings
+    generate_bindings(
+        "rev",
+        Builder::default()
+            // Allow only rev types/functions/constants
+            .allowlist_type("rev::.*")
+            .allowlist_function("rev::.*")
+            .allowlist_var("rev::.*"),
+    );
+
     // Search for libraries
     for i in &["static", "shared"] {
         println!(
