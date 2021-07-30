@@ -8,4 +8,8 @@ edition = "2018"
 
 [dependencies]
 frc = { path = "../frc" }
+tetanus-core = { path = "../tetanus-core" }
+tetanus-frc = { path = "../tetanus-frc" }
+
+anyhow = "1.0"
 uom = {version = "0.31.1", default-features = false, features = [ "autoconvert", "f64", "si", "std", "try-from", "use_serde" ] }
