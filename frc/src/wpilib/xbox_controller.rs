@@ -122,15 +122,15 @@ impl XboxController {
 }
 
 impl GenericHID for XboxController {
-    fn get_handle_ptr(&mut self) -> *mut c_void {
-        &mut self.handle as *mut _ as *mut c_void
+    fn get_handle_ptr(&self) -> *const c_void {
+        &self.handle as *const _ as *const c_void
     }
 
-    fn get_x(&mut self, hand: JoystickHand /* kRightHand */) -> f64 {
-        unsafe { wpilib::frc_XboxController_GetX(self.get_handle_ptr(), hand) }
+    fn get_x(&self, hand: JoystickHand /* kRightHand */) -> f64 {
+        unsafe { wpilib::frc_XboxController_GetX(self.get_handle_ptr() as *mut _, hand) }
     }
 
-    fn get_y(&mut self, hand: JoystickHand /* kRightHand */) -> f64 {
-        unsafe { wpilib::frc_XboxController_GetY(self.get_handle_ptr(), hand) }
+    fn get_y(&self, hand: JoystickHand /* kRightHand */) -> f64 {
+        unsafe { wpilib::frc_XboxController_GetY(self.get_handle_ptr() as *mut _, hand) }
     }
 }

@@ -10,13 +10,13 @@ pub type HIDType = frc_GenericHID_HIDType;
 pub type JoystickHand = frc_GenericHID_JoystickHand;
 
 pub trait GenericHID {
-    fn get_handle_ptr(&mut self) -> *mut c_void;
+    fn get_handle_ptr(&self) -> *const c_void;
 
-    fn get_x(&mut self, hand: JoystickHand /* kRightHand */) -> f64;
+    fn get_x(&self, hand: JoystickHand /* kRightHand */) -> f64;
 
-    fn get_y(&mut self, hand: JoystickHand /* kRightHand */) -> f64;
+    fn get_y(&self, hand: JoystickHand /* kRightHand */) -> f64;
 
-    fn get_raw_button(&mut self, button: i32) -> bool {
+    fn get_raw_button(&self, button: i32) -> bool {
         unsafe {
             wpilib::frc_GenericHID_GetRawButton(
                 self.get_handle_ptr() as *const _ as *const frc_GenericHID,
@@ -25,25 +25,25 @@ pub trait GenericHID {
         }
     }
 
-    fn get_raw_button_pressed(&mut self, button: i32) -> bool {
+    fn get_raw_button_pressed(&self, button: i32) -> bool {
         unsafe {
             wpilib::frc_GenericHID_GetRawButtonPressed(
-                self.get_handle_ptr() as *mut _ as *mut frc_GenericHID,
+                self.get_handle_ptr() as *const _ as *mut frc_GenericHID,
                 button,
             )
         }
     }
 
-    fn get_raw_button_released(&mut self, button: i32) -> bool {
+    fn get_raw_button_released(&self, button: i32) -> bool {
         unsafe {
             wpilib::frc_GenericHID_GetRawButtonReleased(
-                self.get_handle_ptr() as *mut _ as *mut frc_GenericHID,
+                self.get_handle_ptr() as *const _ as *mut frc_GenericHID,
                 button,
             )
         }
     }
 
-    fn get_raw_axis(&mut self, axis: i32) -> f64 {
+    fn get_raw_axis(&self, axis: i32) -> f64 {
         unsafe {
             wpilib::frc_GenericHID_GetRawAxis(
                 self.get_handle_ptr() as *const _ as *const frc_GenericHID,
@@ -52,7 +52,7 @@ pub trait GenericHID {
         }
     }
 
-    fn get_pov(&mut self, pov: i32 /* 0 */) -> i32 {
+    fn get_pov(&self, pov: i32 /* 0 */) -> i32 {
         unsafe {
             wpilib::frc_GenericHID_GetPOV(
                 self.get_handle_ptr() as *const _ as *const frc_GenericHID,
@@ -61,7 +61,7 @@ pub trait GenericHID {
         }
     }
 
-    fn get_axis_count(&mut self) -> i32 {
+    fn get_axis_count(&self) -> i32 {
         unsafe {
             wpilib::frc_GenericHID_GetAxisCount(
                 self.get_handle_ptr() as *const _ as *const frc_GenericHID
@@ -69,7 +69,7 @@ pub trait GenericHID {
         }
     }
 
-    fn get_pov_count(&mut self) -> i32 {
+    fn get_pov_count(&self) -> i32 {
         unsafe {
             wpilib::frc_GenericHID_GetPOVCount(
                 self.get_handle_ptr() as *const _ as *const frc_GenericHID
@@ -77,7 +77,7 @@ pub trait GenericHID {
         }
     }
 
-    fn get_button_count(&mut self) -> i32 {
+    fn get_button_count(&self) -> i32 {
         unsafe {
             wpilib::frc_GenericHID_GetButtonCount(
                 self.get_handle_ptr() as *const _ as *const frc_GenericHID
@@ -85,7 +85,7 @@ pub trait GenericHID {
         }
     }
 
-    fn is_connected(&mut self) -> bool {
+    fn is_connected(&self) -> bool {
         unsafe {
             wpilib::frc_GenericHID_IsConnected(
                 self.get_handle_ptr() as *const _ as *const frc_GenericHID
@@ -93,7 +93,7 @@ pub trait GenericHID {
         }
     }
 
-    fn get_type(&mut self) -> HIDType {
+    fn get_type(&self) -> HIDType {
         unsafe {
             wpilib::frc_GenericHID_GetType(
                 self.get_handle_ptr() as *const _ as *const frc_GenericHID
@@ -103,7 +103,7 @@ pub trait GenericHID {
 
     // fn get_name(&mut self) -> String { }
 
-    fn get_axis_type(&mut self, axis: i32) -> i32 {
+    fn get_axis_type(&self, axis: i32) -> i32 {
         unsafe {
             wpilib::frc_GenericHID_GetAxisType(
                 self.get_handle_ptr() as *const _ as *const frc_GenericHID,
@@ -112,7 +112,7 @@ pub trait GenericHID {
         }
     }
 
-    fn get_port(&mut self) -> i32 {
+    fn get_port(&self) -> i32 {
         unsafe {
             wpilib::frc_GenericHID_GetPort(
                 self.get_handle_ptr() as *const _ as *const frc_GenericHID
@@ -123,7 +123,7 @@ pub trait GenericHID {
     fn set_output(&mut self, output_number: i32, value: bool) {
         unsafe {
             wpilib::frc_GenericHID_SetOutput(
-                self.get_handle_ptr() as *mut _ as *mut frc_GenericHID,
+                self.get_handle_ptr() as *const _ as *mut frc_GenericHID,
                 output_number,
                 value,
             );
@@ -133,7 +133,7 @@ pub trait GenericHID {
     fn set_outputs(&mut self, value: i32) {
         unsafe {
             wpilib::frc_GenericHID_SetOutputs(
-                self.get_handle_ptr() as *mut _ as *mut frc_GenericHID,
+                self.get_handle_ptr() as *const _ as *mut frc_GenericHID,
                 value,
             );
         }
@@ -142,7 +142,7 @@ pub trait GenericHID {
     fn set_rumble(&mut self, rumble_type: RumbleType, value: f64) {
         unsafe {
             wpilib::frc_GenericHID_SetRumble(
-                self.get_handle_ptr() as *mut _ as *mut frc_GenericHID,
+                self.get_handle_ptr() as *const _ as *mut frc_GenericHID,
                 rumble_type,
                 value,
             );

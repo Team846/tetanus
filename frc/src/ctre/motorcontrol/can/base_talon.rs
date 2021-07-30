@@ -3,10 +3,10 @@ use frc_sys::ctre::ctre_phoenix_motorcontrol_SupplyCurrentLimitConfiguration;
 
 use crate::ctre as frc_ctre;
 use crate::ctre::motorcontrol::SupplyCurrentLimitConfiguration;
-use crate::ctre::ErrorCode;
 
 use super::base_motor_controller::BaseMotorController;
 
+use anyhow::Result;
 use uom::si::electric_current::ampere;
 use uom::si::f64::*;
 
@@ -45,7 +45,7 @@ pub trait BaseTalon: BaseMotorController {
         &mut self,
         curr_limit_configs: SupplyCurrentLimitConfiguration,
         timeout_ms: i32, /* 50 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseTalon_ConfigSupplyCurrentLimit(
                 self.get_handle_ptr(),

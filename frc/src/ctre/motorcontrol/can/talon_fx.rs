@@ -11,12 +11,12 @@ use frc_sys::ctre::{
 
 use super::base_motor_controller::BaseMotorController;
 use super::base_talon::BaseTalon;
+use crate::ctre as frc_ctre;
 use crate::ctre::motorcontrol::{
     DemandType, StatorCurrentLimitConfiguration, SupplyCurrentLimitConfiguration,
     TalonFXControlMode, TalonFXFeedbackDevice, TalonFXInvertType,
 };
-use crate::ctre::{self as frc_ctre, ErrorCode};
-
+use anyhow::Result;
 pub struct TalonFX {
     handle: ctre_phoenix_motorcontrol_can_TalonFX,
 }
@@ -57,7 +57,7 @@ impl TalonFX {
         feedback_device: TalonFXFeedbackDevice,
         pid_idx: i32,    /* 0 */
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             self.handle
                 .ConfigSelectedFeedbackSensor(feedback_device, pid_idx, timeout_ms)
@@ -68,7 +68,7 @@ impl TalonFX {
         &mut self,
         curr_limit_configs: SupplyCurrentLimitConfiguration,
         timeout_ms: i32, /* 50 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             // handle method not generated
             ctre_phoenix_motorcontrol_can_TalonFX_ConfigSupplyCurrentLimit(
@@ -84,7 +84,7 @@ impl TalonFX {
         &mut self,
         curr_limit_configs: StatorCurrentLimitConfiguration,
         timeout_ms: i32, /* 50 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             self.handle.ConfigStatorCurrentLimit(
                 &curr_limit_configs.into()
@@ -97,7 +97,7 @@ impl TalonFX {
     pub fn config_get_supply_current_limit(
         &mut self,
         timeout_ms: i32, /* 50 */
-    ) -> Result<SupplyCurrentLimitConfiguration, ErrorCode> {
+    ) -> Result<SupplyCurrentLimitConfiguration> {
         let mut config = ctre_phoenix_motorcontrol_SupplyCurrentLimitConfiguration {
             enable: false,
             currentLimit: 0.0,
@@ -118,7 +118,7 @@ impl TalonFX {
     pub fn config_get_stator_current_limit(
         &mut self,
         timeout_ms: i32, /* 50 */
-    ) -> Result<StatorCurrentLimitConfiguration, ErrorCode> {
+    ) -> Result<StatorCurrentLimitConfiguration> {
         let mut config = ctre_phoenix_motorcontrol_StatorCurrentLimitConfiguration {
             enable: false,
             currentLimit: 0.0,

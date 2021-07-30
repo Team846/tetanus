@@ -10,8 +10,9 @@ use crate::ctre::{
         RemoteLimitSwitchSource, RemoteSensorSource, SensorTerm, StatusFrame, StatusFrameEnhanced,
         VelocityMeasPeriod,
     },
-    ErrorCode,
 };
+
+use anyhow::Result;
 
 use uom::si::electric_potential::volt;
 use uom::si::f64::*;
@@ -103,7 +104,7 @@ pub trait BaseMotorController {
         }
     }
 
-    fn config_factory_default(&mut self, timeout_ms: i32 /* 50 */) -> Result<(), ErrorCode> {
+    fn config_factory_default(&mut self, timeout_ms: i32 /* 50 */) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigFactoryDefault(
                 self.get_handle_ptr(),
@@ -116,7 +117,7 @@ pub trait BaseMotorController {
         &mut self,
         time_from_neutral_to_full: Time,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigOpenloopRamp(
                 self.get_handle_ptr(),
@@ -130,7 +131,7 @@ pub trait BaseMotorController {
         &mut self,
         time_from_neutral_to_full: Time,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigClosedloopRamp(
                 self.get_handle_ptr(),
@@ -144,7 +145,7 @@ pub trait BaseMotorController {
         &mut self,
         out: Ratio,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigPeakOutputForward(
                 self.get_handle_ptr(),
@@ -158,7 +159,7 @@ pub trait BaseMotorController {
         &mut self,
         out: Ratio,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigPeakOutputReverse(
                 self.get_handle_ptr(),
@@ -172,7 +173,7 @@ pub trait BaseMotorController {
         &mut self,
         out: Ratio,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigNominalOutputForward(
                 self.get_handle_ptr(),
@@ -186,7 +187,7 @@ pub trait BaseMotorController {
         &mut self,
         out: Ratio,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigNominalOutputReverse(
                 self.get_handle_ptr(),
@@ -200,7 +201,7 @@ pub trait BaseMotorController {
         &mut self,
         deadband: Ratio,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigNeutralDeadband(
                 self.get_handle_ptr(),
@@ -214,7 +215,7 @@ pub trait BaseMotorController {
         &mut self,
         voltage: ElectricPotential,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigVoltageCompSaturation(
                 self.get_handle_ptr(),
@@ -228,7 +229,7 @@ pub trait BaseMotorController {
         &mut self,
         filter_window_samples: i32,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigVoltageMeasurementFilter(
                 self.get_handle_ptr(),
@@ -292,7 +293,7 @@ pub trait BaseMotorController {
         feedback_device: RemoteFeedbackDevice,
         pid_idx: i32,    /* 0 */
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigSelectedFeedbackSensor(
                 self.get_handle_ptr(),
@@ -308,7 +309,7 @@ pub trait BaseMotorController {
         feedback_device: FeedbackDevice,
         pid_idx: i32,    /* 0 */
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigSelectedFeedbackSensor1(
                 self.get_handle_ptr(),
@@ -324,7 +325,7 @@ pub trait BaseMotorController {
         coefficient: f64,
         pid_idx: i32,    /* 0 */
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigSelectedFeedbackCoefficient(
                 self.get_handle_ptr(),
@@ -341,7 +342,7 @@ pub trait BaseMotorController {
         remote_sensor_source: RemoteSensorSource,
         remote_ordinal: i32,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigRemoteFeedbackFilter(
                 self.get_handle_ptr(),
@@ -353,14 +354,14 @@ pub trait BaseMotorController {
         })
     }
 
-    // fn ConfigRemoteFeedbackFilter1(&mut self, canCoderRef: &CANCoder, remoteOrdinal: i32, timeout_ms: i32 /* 0 */) -> Result<(), ErrorCode>  { }
+    // fn ConfigRemoteFeedbackFilter1(&mut self, canCoderRef: &CANCoder, remoteOrdinal: i32, timeout_ms: i32 /* 0 */) -> Result<()>  { }
 
     fn config_sensor_term(
         &mut self,
         sensor_term: SensorTerm,
         feedback_device: FeedbackDevice,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigSensorTerm(
                 self.get_handle_ptr(),
@@ -376,7 +377,7 @@ pub trait BaseMotorController {
         sensor_term: SensorTerm,
         feedback_device: RemoteFeedbackDevice,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigSensorTerm1(
                 self.get_handle_ptr(),
@@ -410,7 +411,7 @@ pub trait BaseMotorController {
         sensor_pos: f64,
         pid_idx: i32,    /* 0 */
         timeout_ms: i32, /* 50 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_SetSelectedSensorPosition(
                 self.get_handle_ptr(),
@@ -421,11 +422,7 @@ pub trait BaseMotorController {
         })
     }
 
-    fn set_control_frame_period(
-        &mut self,
-        frame: ControlFrame,
-        period_ms: i32,
-    ) -> Result<(), ErrorCode> {
+    fn set_control_frame_period(&mut self, frame: ControlFrame, period_ms: i32) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_SetControlFramePeriod(
                 self.get_handle_ptr(),
@@ -440,7 +437,7 @@ pub trait BaseMotorController {
         frame: StatusFrame,
         period_ms: u8,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_SetStatusFramePeriod(
                 self.get_handle_ptr(),
@@ -456,7 +453,7 @@ pub trait BaseMotorController {
         frame: StatusFrameEnhanced,
         period_ms: u8,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_SetStatusFramePeriod1(
                 self.get_handle_ptr(),
@@ -495,7 +492,7 @@ pub trait BaseMotorController {
         &mut self,
         period: VelocityMeasPeriod,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigVelocityMeasurementPeriod(
                 self.get_handle_ptr(),
@@ -509,7 +506,7 @@ pub trait BaseMotorController {
         &mut self,
         window_size: i32,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigVelocityMeasurementWindow(
                 self.get_handle_ptr(),
@@ -525,7 +522,7 @@ pub trait BaseMotorController {
         normal_open_or_close: LimitSwitchNormal,
         device_id: i32,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigForwardLimitSwitchSource(
                 self.get_handle_ptr(),
@@ -543,7 +540,7 @@ pub trait BaseMotorController {
         normal_open_or_close: LimitSwitchNormal,
         device_id: i32,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigReverseLimitSwitchSource(
                 self.get_handle_ptr(),
@@ -569,7 +566,7 @@ pub trait BaseMotorController {
         type_: LimitSwitchSource,
         normal_open_or_close: LimitSwitchNormal,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigForwardLimitSwitchSource1(
                 self.get_handle_ptr(),
@@ -585,7 +582,7 @@ pub trait BaseMotorController {
         type_: LimitSwitchSource,
         normal_open_or_close: LimitSwitchNormal,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigReverseLimitSwitchSource1(
                 self.get_handle_ptr(),
@@ -600,7 +597,7 @@ pub trait BaseMotorController {
         &mut self,
         forward_sensor_limit: f64,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigForwardSoftLimitThreshold(
                 self.get_handle_ptr(),
@@ -614,7 +611,7 @@ pub trait BaseMotorController {
         &mut self,
         reverse_sensor_limit: f64,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigReverseSoftLimitThreshold(
                 self.get_handle_ptr(),
@@ -628,7 +625,7 @@ pub trait BaseMotorController {
         &mut self,
         enable: bool,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigForwardSoftLimitEnable(
                 self.get_handle_ptr(),
@@ -642,7 +639,7 @@ pub trait BaseMotorController {
         &mut self,
         enable: bool,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigReverseSoftLimitEnable(
                 self.get_handle_ptr(),
@@ -661,12 +658,7 @@ pub trait BaseMotorController {
         }
     }
 
-    fn config_kp(
-        &mut self,
-        slot_idx: i32,
-        value: f64,
-        timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    fn config_kp(&mut self, slot_idx: i32, value: f64, timeout_ms: i32 /* 0 */) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_Config_kP(
                 self.get_handle_ptr(),
@@ -677,12 +669,7 @@ pub trait BaseMotorController {
         })
     }
 
-    fn config_ki(
-        &mut self,
-        slot_idx: i32,
-        value: f64,
-        timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    fn config_ki(&mut self, slot_idx: i32, value: f64, timeout_ms: i32 /* 0 */) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_Config_kI(
                 self.get_handle_ptr(),
@@ -693,12 +680,7 @@ pub trait BaseMotorController {
         })
     }
 
-    fn config_kd(
-        &mut self,
-        slot_idx: i32,
-        value: f64,
-        timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    fn config_kd(&mut self, slot_idx: i32, value: f64, timeout_ms: i32 /* 0 */) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_Config_kD(
                 self.get_handle_ptr(),
@@ -709,12 +691,7 @@ pub trait BaseMotorController {
         })
     }
 
-    fn config_kf(
-        &mut self,
-        slot_idx: i32,
-        value: f64,
-        timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    fn config_kf(&mut self, slot_idx: i32, value: f64, timeout_ms: i32 /* 0 */) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_Config_kF(
                 self.get_handle_ptr(),
@@ -730,7 +707,7 @@ pub trait BaseMotorController {
         slot_idx: i32,
         izone: f64,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_Config_IntegralZone(
                 self.get_handle_ptr(),
@@ -746,7 +723,7 @@ pub trait BaseMotorController {
         slot_idx: i32,
         allowable_close_loop_error: f64,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigAllowableClosedloopError(
                 self.get_handle_ptr(),
@@ -762,7 +739,7 @@ pub trait BaseMotorController {
         slot_idx: i32,
         iaccum: f64,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigMaxIntegralAccumulator(
                 self.get_handle_ptr(),
@@ -778,7 +755,7 @@ pub trait BaseMotorController {
         slot_idx: i32,
         out: Ratio,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigClosedLoopPeakOutput(
                 self.get_handle_ptr(),
@@ -794,7 +771,7 @@ pub trait BaseMotorController {
         slot_idx: i32,
         loop_time_ms: i32,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigClosedLoopPeriod(
                 self.get_handle_ptr(),
@@ -805,11 +782,7 @@ pub trait BaseMotorController {
         })
     }
 
-    fn config_aux_pidpolarity(
-        &mut self,
-        invert: bool,
-        timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    fn config_aux_pidpolarity(&mut self, invert: bool, timeout_ms: i32 /* 0 */) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigAuxPIDPolarity(
                 self.get_handle_ptr(),
@@ -824,7 +797,7 @@ pub trait BaseMotorController {
         iaccum: f64,
         pid_idx: i32,    /* 0 */
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_SetIntegralAccumulator(
                 self.get_handle_ptr(),
@@ -862,7 +835,7 @@ pub trait BaseMotorController {
         }
     }
 
-    fn select_profile_slot(&mut self, slot_idx: i32, pid_idx: i32) -> Result<(), ErrorCode> {
+    fn select_profile_slot(&mut self, slot_idx: i32, pid_idx: i32) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_SelectProfileSlot(
                 self.get_handle_ptr(),
@@ -908,27 +881,27 @@ pub trait BaseMotorController {
         }
     }
 
-    // fn ConfigMotionCruiseVelocity(&mut self, sensorUnitsPer100ms: f64,timeout_ms: i32 /* 0 */) -> Result<(), ErrorCode> {}
-    // fn ConfigMotionAcceleration(&mut self, sensorUnitsPer100msPerSec: f64,timeout_ms: i32 /* 0 */) -> Result<(), ErrorCode> {}
-    // fn ConfigMotionSCurveStrength(&mut self, curveStrength: i32, timeout_ms: i32 /* 0 */) -> Result<(), ErrorCode>  {}
-    // fn ClearMotionProfileTrajectories(&mut self, ) -> Result<(), ErrorCode>  {        }
+    // fn ConfigMotionCruiseVelocity(&mut self, sensorUnitsPer100ms: f64,timeout_ms: i32 /* 0 */) -> Result<()> {}
+    // fn ConfigMotionAcceleration(&mut self, sensorUnitsPer100msPerSec: f64,timeout_ms: i32 /* 0 */) -> Result<()> {}
+    // fn ConfigMotionSCurveStrength(&mut self, curveStrength: i32, timeout_ms: i32 /* 0 */) -> Result<()>  {}
+    // fn ClearMotionProfileTrajectories(&mut self, ) -> Result<()>  {        }
     // fn GetMotionProfileTopLevelBufferCount(&mut self, ) -> i32  {}
-    // fn PushMotionProfileTrajectory(&mut self, const ctre::phoenix::motion::TrajectoryPoint& trajPt) -> Result<(), ErrorCode>  {}
-    // fn StartMotionProfile(&mut self, ctre::phoenix::motion::BufferedTrajectoryPointStream& stream, minBufferedPts: u32, motionProfControlMode: ControlMode ) -> Result<(), ErrorCode>  {}
+    // fn PushMotionProfileTrajectory(&mut self, const ctre::phoenix::motion::TrajectoryPoint& trajPt) -> Result<()>  {}
+    // fn StartMotionProfile(&mut self, ctre::phoenix::motion::BufferedTrajectoryPointStream& stream, minBufferedPts: u32, motionProfControlMode: ControlMode ) -> Result<()>  {}
     // fn IsMotionProfileFinished(&mut self) -> bool {}
     // fn IsMotionProfileTopLevelBufferFull(&mut self, ) -> bool {}
     // fn ProcessMotionProfileBuffer(&mut self, )  {}
-    // fn GetMotionProfileStatus(&mut self, ctre::phoenix::motion::MotionProfileStatus& statusToFill) -> Result<(), ErrorCode>  {}
-    // fn ClearMotionProfileHasUnderrun(&mut self, timeout_ms: i32 /* 0 */) -> Result<(), ErrorCode>  {    }
-    // fn ChangeMotionControlFramePeriod(&mut self, period_ms: i32) -> Result<(), ErrorCode>  {        }
-    // fn ConfigMotionProfileTrajectoryPeriod(&mut self, baseTrajDurationMs: i32, timeout_ms: i32 /* 0 */) -> Result<(), ErrorCode>  {        }
-    // fn ConfigMotionProfileTrajectoryInterpolationEnable(&mut self, enable: bool, timeout_ms: i32 /* 0 */) -> Result<(), ErrorCode>  {}
+    // fn GetMotionProfileStatus(&mut self, ctre::phoenix::motion::MotionProfileStatus& statusToFill) -> Result<()>  {}
+    // fn ClearMotionProfileHasUnderrun(&mut self, timeout_ms: i32 /* 0 */) -> Result<()>  {    }
+    // fn ChangeMotionControlFramePeriod(&mut self, period_ms: i32) -> Result<()>  {        }
+    // fn ConfigMotionProfileTrajectoryPeriod(&mut self, baseTrajDurationMs: i32, timeout_ms: i32 /* 0 */) -> Result<()>  {        }
+    // fn ConfigMotionProfileTrajectoryInterpolationEnable(&mut self, enable: bool, timeout_ms: i32 /* 0 */) -> Result<()>  {}
 
     fn config_feedback_not_continuous(
         &mut self,
         feedback_not_continuous: bool,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigFeedbackNotContinuous(
                 self.get_handle_ptr(),
@@ -942,7 +915,7 @@ pub trait BaseMotorController {
         &mut self,
         remote_sensor_closed_loop_disable_neutral_on_los: bool,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigRemoteSensorClosedLoopDisableNeutralOnLOS(self.get_handle_ptr(), remote_sensor_closed_loop_disable_neutral_on_los, timeout_ms)
         })
@@ -952,7 +925,7 @@ pub trait BaseMotorController {
         &mut self,
         clear_position_on_limit_f: bool,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigClearPositionOnLimitF(
                 self.get_handle_ptr(),
@@ -966,7 +939,7 @@ pub trait BaseMotorController {
         &mut self,
         clear_position_on_limit_r: bool,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigClearPositionOnLimitR(
                 self.get_handle_ptr(),
@@ -980,7 +953,7 @@ pub trait BaseMotorController {
         &mut self,
         clear_position_on_quad_idx: bool,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigClearPositionOnQuadIdx(
                 self.get_handle_ptr(),
@@ -994,7 +967,7 @@ pub trait BaseMotorController {
         &mut self,
         limit_switch_disable_neutral_on_los: bool,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigLimitSwitchDisableNeutralOnLOS(
                 self.get_handle_ptr(),
@@ -1008,7 +981,7 @@ pub trait BaseMotorController {
         &mut self,
         soft_limit_disable_neutral_on_los: bool,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigSoftLimitDisableNeutralOnLOS(
                 self.get_handle_ptr(),
@@ -1022,7 +995,7 @@ pub trait BaseMotorController {
         &mut self,
         pulse_width_period_edges_per_rot: i32,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigPulseWidthPeriod_EdgesPerRot(
                 self.get_handle_ptr(),
@@ -1036,7 +1009,7 @@ pub trait BaseMotorController {
         &mut self,
         pulse_width_period_filter_window_sz: i32,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ConfigPulseWidthPeriod_FilterWindowSz(
                 self.get_handle_ptr(),
@@ -1046,7 +1019,7 @@ pub trait BaseMotorController {
         })
     }
 
-    fn get_last_error(&mut self) -> Result<(), ErrorCode> {
+    fn get_last_error(&mut self) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_GetLastError(
                 self.get_handle_ptr(),
@@ -1054,10 +1027,10 @@ pub trait BaseMotorController {
         })
     }
 
-    // fn GetFaults(&mut self, Faults& toFill) -> Result<(), ErrorCode>  { }
-    // fn GetStickyFaults(&mut self, StickyFaults& toFill) -> Result<(), ErrorCode>  { }
+    // fn GetFaults(&mut self, Faults& toFill) -> Result<()>  { }
+    // fn GetStickyFaults(&mut self, StickyFaults& toFill) -> Result<()>  { }
 
-    fn clear_sticky_faults(&mut self, timeout_ms: i32 /* 0 */) -> Result<(), ErrorCode> {
+    fn clear_sticky_faults(&mut self, timeout_ms: i32 /* 0 */) -> Result<()> {
         frc_ctre::to_result(unsafe {
             ctre::ctre_phoenix_motorcontrol_can_BaseMotorController_ClearStickyFaults(
                 self.get_handle_ptr(),
@@ -1082,11 +1055,11 @@ pub trait BaseMotorController {
         }
     }
 
-    // fn ConfigSetCustomParam(&mut self, newValue: i32, paramIndex: i32,timeout_ms: i32 /* 0 */) -> Result<(), ErrorCode> {}
+    // fn ConfigSetCustomParam(&mut self, newValue: i32, paramIndex: i32,timeout_ms: i32 /* 0 */) -> Result<()> {}
     // fn ConfigGetCustomParam(paramIndex: i32,timeout_ms: i32 /* 0 */);
-    // fn ConfigSetParameter(&mut self, ctre::phoenix::ParamEnum param, value: f64,uint8_t subValue, ordinal: i32, timeout_ms: i32 /* 0 */) -> Result<(), ErrorCode> {}
+    // fn ConfigSetParameter(&mut self, ctre::phoenix::ParamEnum param, value: f64,uint8_t subValue, ordinal: i32, timeout_ms: i32 /* 0 */) -> Result<()> {}
     // fn ConfigGetParameter(&mut self, ctre::phoenix::ParamEnum param, ordinal: i32, timeout_ms: i32 /* 0 */) -> f64  {}
-    // fn ConfigGetParameter(ParamEnum param, int32_t valueToSend,int32_t& valueReceived, uint8_t& subValue, int32_t ordinal,timeoutMs: i32) -> Result<(), ErrorCode> {}
+    // fn ConfigGetParameter(ParamEnum param, int32_t valueToSend,int32_t& valueReceived, uint8_t& subValue, int32_t ordinal,timeoutMs: i32) -> Result<()> {}
 
     fn get_base_id(&mut self) -> i32 {
         unsafe {

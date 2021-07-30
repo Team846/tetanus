@@ -182,7 +182,7 @@ fn compile_cc(name: &str) {
         build.include(CWD.join(TOOLCHAIN).join(include));
     }
 
-    build.compile(&name);
+    build.compile(name);
 }
 
 fn generate_bindings(module: &str, builder: Builder) {

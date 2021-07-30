@@ -1,11 +1,12 @@
-use crate::ctre::{self as frc_ctre, ErrorCode};
-use frc_sys::ctre::ctre_phoenix_sensors_CANCoder;
+use crate::ctre as frc_ctre;
+use frc_sys::ctre::{ctre_phoenix_ErrorCode, ctre_phoenix_sensors_CANCoder};
 
 use super::{
     AbsoluteSensorRange, MagnetFieldStrength, SensorInitializationStrategy, SensorTimeBase,
     SensorVelocityMeasPeriod,
 };
 
+use anyhow::Result;
 use uom::si::angle::degree;
 use uom::si::electric_potential::volt;
 use uom::si::f64::*;
@@ -29,15 +30,11 @@ impl CANCoder {
         unsafe { self.handle.GetVelocity() }
     }
 
-    pub fn set_position(
-        &mut self,
-        new_position: f64,
-        timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    pub fn set_position(&mut self, new_position: f64, timeout_ms: i32 /* 0 */) -> Result<()> {
         frc_ctre::to_result(unsafe { self.handle.SetPosition(new_position, timeout_ms) })
     }
 
-    pub fn set_position_to_absolute(&mut self, timeout_ms: i32) -> Result<(), ErrorCode> {
+    pub fn set_position_to_absolute(&mut self, timeout_ms: i32) -> Result<()> {
         frc_ctre::to_result(unsafe { self.handle.SetPositionToAbsolute(timeout_ms) })
     }
 
@@ -49,7 +46,7 @@ impl CANCoder {
         &mut self,
         period: SensorVelocityMeasPeriod,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             self.handle
                 .ConfigVelocityMeasurementPeriod(period, timeout_ms)
@@ -60,7 +57,7 @@ impl CANCoder {
         &mut self,
         window_size: i32,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             self.handle
                 .ConfigVelocityMeasurementWindow(window_size, timeout_ms)
@@ -71,7 +68,7 @@ impl CANCoder {
         &mut self,
         absolute_sensor_range: AbsoluteSensorRange,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             self.handle
                 .ConfigAbsoluteSensorRange(absolute_sensor_range, timeout_ms)
@@ -82,7 +79,7 @@ impl CANCoder {
         &mut self,
         offset: Angle,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             self.handle
                 .ConfigMagnetOffset(offset.get::<degree>(), timeout_ms)
@@ -93,7 +90,7 @@ impl CANCoder {
         &mut self,
         initialization_strategy: SensorInitializationStrategy,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             self.handle
                 .ConfigSensorInitializationStrategy(initialization_strategy, timeout_ms)
@@ -106,7 +103,7 @@ impl CANCoder {
         _unit_string: &str,
         _sensortime_base: SensorTimeBase,
         _timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         unimplemented!()
     }
 
@@ -122,14 +119,14 @@ impl CANCoder {
         &mut self,
         b_sensor_direction: bool,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             self.handle
                 .ConfigSensorDirection(b_sensor_direction, timeout_ms)
         })
     }
 
-    pub fn get_last_error(&mut self) -> ErrorCode {
+    pub fn get_last_error(&mut self) -> ctre_phoenix_ErrorCode {
         unsafe { self.handle.GetLastError() }
     }
 
@@ -146,7 +143,7 @@ impl CANCoder {
         new_value: i32,
         param_index: i32,
         timeout_ms: i32, /* 0 */
-    ) -> Result<(), ErrorCode> {
+    ) -> Result<()> {
         frc_ctre::to_result(unsafe {
             self.handle
                 .ConfigSetCustomParam(new_value, param_index, timeout_ms)

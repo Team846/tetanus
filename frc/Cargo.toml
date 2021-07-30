@@ -8,4 +8,6 @@ edition = "2018"
 
 [dependencies]
 frc-sys = { path = "../frc-sys" }
+
+anyhow = "1.0"
 uom = {version = "0.31.1", default-features = false, features = [ "autoconvert", "f64", "si", "std", "try-from", "use_serde" ] }
