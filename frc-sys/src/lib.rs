@@ -6,4 +6,5 @@
 #![allow(clippy::all)]
 pub mod ctre;
 pub mod hal;
+pub mod rev;
 pub mod wpilib;
