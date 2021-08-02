@@ -7,8 +7,8 @@ use frc_sys::rev::{
 use std::ffi::c_void;
 
 use super::{
-    AlternateEncoderType, AnalogMode, ExternalFollower, FaultID, IdleMode, LimitSwitchPolarity,
-    SoftLimitDirection,
+    AlternateEncoderType, AnalogMode, CANAnalog, CANDigitalInput, CANEncoder, CANError,
+    CANPIDController, ExternalFollower, FaultID, IdleMode, LimitSwitchPolarity, SoftLimitDirection,
 };
 pub struct CANSparkMax {
     handle: rev_CANSparkMax,
@@ -31,10 +31,8 @@ impl CANSparkMax {
 
     // }
 
-    pub fn get(&mut self) {
-        unsafe {
-            rev_CANSparkMax_Get(&mut self.handle as *mut _ as *mut c_void);
-        }
+    pub fn get(&mut self) -> f64 {
+        unsafe { rev_CANSparkMax_Get(&mut self.handle as *mut _ as *mut c_void) }
     }
 
     pub fn set_inverted(&mut self, is_inverted: bool) {
@@ -43,10 +41,8 @@ impl CANSparkMax {
         }
     }
 
-    pub fn get_inverted(&mut self) {
-        unsafe {
-            rev_CANSparkMax_GetInverted(&mut self.handle as *mut _ as *mut c_void);
-        }
+    pub fn get_inverted(&mut self) -> bool {
+        unsafe { rev_CANSparkMax_GetInverted(&mut self.handle as *mut _ as *mut c_void) }
     }
 
     pub fn disable(&mut self) {
@@ -63,50 +59,39 @@ impl CANSparkMax {
         }
     }
 
-    pub fn get_encoder(&mut self, sensor_type: EncoderType, counts_per_rev: i32) {
-        unsafe {
-            self.handle.GetEncoder(sensor_type, counts_per_rev);
-        }
+    pub fn get_encoder(&mut self, sensor_type: EncoderType, counts_per_rev: i32) -> CANEncoder {
+        unsafe { self.handle.GetEncoder(sensor_type, counts_per_rev) }
     }
 
     pub fn get_alternate_encoder(
         &mut self,
         sensor_type: AlternateEncoderType,
         counts_per_rev: i32,
-    ) {
-        unsafe {
-            self.handle.GetAlternateEncoder(sensor_type, counts_per_rev);
-        }
+    ) -> CANEncoder {
+        unsafe { self.handle.GetAlternateEncoder(sensor_type, counts_per_rev) }
     }
 
-    pub fn get_analog(&mut self, mode: AnalogMode /* CANAnalog::AnalogMode::kAbsolute */) {
-        unsafe {
-            self.handle.GetAnalog(mode);
-        }
+    pub fn get_analog(
+        &mut self,
+        mode: AnalogMode, /* CANAnalog::AnalogMode::kAbsolute */
+    ) -> CANAnalog {
+        unsafe { self.handle.GetAnalog(mode) }
     }
 
-    pub fn get_PID_controller(&mut self) {
-        unsafe {
-            self.handle.GetPIDController();
-        }
+    pub fn get_PID_controller(&mut self) -> CANPIDController {
+        unsafe { self.handle.GetPIDController() }
     }
 
-    pub fn get_forward_limit_switch(&mut self, polarity: LimitSwitchPolarity) {
-        unsafe {
-            self.handle.GetForwardLimitSwitch(polarity);
-        }
+    pub fn get_forward_limit_switch(&mut self, polarity: LimitSwitchPolarity) -> CANDigitalInput {
+        unsafe { self.handle.GetForwardLimitSwitch(polarity) }
     }
 
-    pub fn get_reverse_limit_switch(&mut self, polarity: LimitSwitchPolarity) {
-        unsafe {
-            self.handle.GetReverseLimitSwitch(polarity);
-        }
+    pub fn get_reverse_limit_switch(&mut self, polarity: LimitSwitchPolarity) -> CANDigitalInput {
+        unsafe { self.handle.GetReverseLimitSwitch(polarity) }
     }
 
-    pub fn set_smart_current_limit(&mut self, limit: u32) {
-        unsafe {
-            self.handle.SetSmartCurrentLimit(limit);
-        }
+    pub fn set_smart_current_limit(&mut self, limit: u32) -> CANError {
+        unsafe { self.handle.SetSmartCurrentLimit(limit) }
     }
 
     pub fn set_smart_current_limit1(
@@ -114,71 +99,63 @@ impl CANSparkMax {
         stall_limit: u32,
         free_limit: u32,
         limit_RPM: u32, /* 20000 */
-    ) {
+    ) -> CANError {
         unsafe {
             self.handle
-                .SetSmartCurrentLimit1(stall_limit, free_limit, limit_RPM);
+                .SetSmartCurrentLimit1(stall_limit, free_limit, limit_RPM)
         }
     }
 
-    pub fn set_secondary_current_limit(&mut self, limit: f64, limit_cycles: i32 /* 0 */) {
-        unsafe {
-            self.handle.SetSecondaryCurrentLimit(limit, limit_cycles);
-        }
+    pub fn set_secondary_current_limit(
+        &mut self,
+        limit: f64,
+        limit_cycles: i32, /* 0 */
+    ) -> CANError {
+        unsafe { self.handle.SetSecondaryCurrentLimit(limit, limit_cycles) }
     }
 
-    pub fn set_idle_mode(&mut self, mode: IdleMode) {
-        unsafe {
-            self.handle.SetIdleMode(mode);
-        }
+    pub fn set_idle_mode(&mut self, mode: IdleMode) -> CANError {
+        unsafe { self.handle.SetIdleMode(mode) }
     }
 
-    pub fn get_idle_mode(&mut self) {
-        unsafe {
-            self.handle.GetIdleMode();
-        }
+    pub fn get_idle_mode(&mut self) -> IdleMode {
+        unsafe { self.handle.GetIdleMode() }
     }
 
-    pub fn enable_voltage_compensation(&mut self, nominal_voltage: f64) {
-        unsafe {
-            self.handle.EnableVoltageCompensation(nominal_voltage);
-        }
+    pub fn enable_voltage_compensation(&mut self, nominal_voltage: f64) -> CANError {
+        unsafe { self.handle.EnableVoltageCompensation(nominal_voltage) }
     }
 
-    pub fn disable_voltage_compensation(&mut self) {
-        unsafe {
-            self.handle.DisableVoltageCompensation();
-        }
+    pub fn disable_voltage_compensation(&mut self) -> CANError {
+        unsafe { self.handle.DisableVoltageCompensation() }
     }
 
-    pub fn get_voltage_compensation_nominal_voltage(&mut self) {
-        unsafe {
-            self.handle.GetVoltageCompensationNominalVoltage();
-        }
+    pub fn get_voltage_compensation_nominal_voltage(&mut self) -> f64 {
+        unsafe { self.handle.GetVoltageCompensationNominalVoltage() }
     }
 
-    pub fn set_open_loop_ramp_rate(&mut self, rate: f64) {
-        unsafe {
-            self.handle.SetOpenLoopRampRate(rate);
-        }
+    pub fn set_open_loop_ramp_rate(&mut self, rate: f64) -> CANError {
+        unsafe { self.handle.SetOpenLoopRampRate(rate) }
     }
 
-    pub fn set_closed_loop_ramp_rate(&mut self, rate: f64) {
-        unsafe {
-            self.handle.SetClosedLoopRampRate(rate);
-        }
+    pub fn set_closed_loop_ramp_rate(&mut self, rate: f64) -> CANError {
+        unsafe { self.handle.SetClosedLoopRampRate(rate) }
     }
 
-    pub fn get_closed_loop_ramp_rate(&mut self) {
-        unsafe {
-            self.handle.GetClosedLoopRampRate();
-        }
+    pub fn get_open_loop_ramp_rate(&mut self) -> f64 {
+        unsafe { self.handle.GetOpenLoopRampRate() }
     }
 
-    pub fn follow(&mut self, leader: *const rev_CANSparkMax, invert: bool /* false */) {
-        unsafe {
-            self.handle.Follow(leader, invert);
-        }
+    pub fn get_closed_loop_ramp_rate(&mut self) -> f64 {
+        unsafe { self.handle.GetClosedLoopRampRate() }
+    }
+
+    pub fn follow(
+        &mut self,
+        leader: *const rev_CANSparkMax,
+        invert: bool, /* false */
+    ) -> CANError {
+        unsafe { self.handle.Follow(leader, invert) }
     }
 
     pub fn follow1(
@@ -186,111 +163,75 @@ impl CANSparkMax {
         leader: ExternalFollower,
         device_id: i32,
         invert: bool, /* flase */
-    ) {
-        unsafe {
-            self.handle.Follow1(leader, device_id, invert);
-        }
+    ) -> CANError {
+        unsafe { self.handle.Follow1(leader, device_id, invert) }
     }
 
-    pub fn is_follower(&mut self) {
-        unsafe {
-            self.handle.IsFollower();
-        }
+    pub fn is_follower(&mut self) -> bool {
+        unsafe { self.handle.IsFollower() }
     }
 
-    pub fn get_faults(&mut self) {
-        unsafe {
-            self.handle.GetFaults();
-        }
+    pub fn get_faults(&mut self) -> u16 {
+        unsafe { self.handle.GetFaults() }
     }
 
-    pub fn get_sticky_faults(&mut self) {
-        unsafe {
-            self.handle.GetStickyFaults();
-        }
+    pub fn get_sticky_faults(&mut self) -> u16 {
+        unsafe { self.handle.GetStickyFaults() }
     }
 
-    pub fn get_fault(&mut self, fault_id: FaultID) {
-        unsafe {
-            self.handle.GetFault(fault_id);
-        }
+    pub fn get_fault(&mut self, fault_id: FaultID) -> bool {
+        unsafe { self.handle.GetFault(fault_id) }
     }
 
-    pub fn get_sticky_fault(&mut self, fault_id: FaultID) {
-        unsafe {
-            self.handle.GetStickyFault(fault_id);
-        }
+    pub fn get_sticky_fault(&mut self, fault_id: FaultID) -> bool {
+        unsafe { self.handle.GetStickyFault(fault_id) }
     }
 
-    pub fn get_bus_voltage(&mut self) {
-        unsafe {
-            self.handle.GetBusVoltage();
-        }
+    pub fn get_bus_voltage(&mut self) -> f64 {
+        unsafe { self.handle.GetBusVoltage() }
     }
 
-    pub fn get_applied_output(&mut self) {
-        unsafe {
-            self.handle.GetAppliedOutput();
-        }
+    pub fn get_applied_output(&mut self) -> f64 {
+        unsafe { self.handle.GetAppliedOutput() }
     }
 
-    pub fn get_output_current(&mut self) {
-        unsafe {
-            self.handle.GetOutputCurrent();
-        }
+    pub fn get_output_current(&mut self) -> f64 {
+        unsafe { self.handle.GetOutputCurrent() }
     }
 
-    pub fn get_motor_temperature(&mut self) {
-        unsafe {
-            self.handle.GetMotorTemperature();
-        }
+    pub fn get_motor_temperature(&mut self) -> f64 {
+        unsafe { self.handle.GetMotorTemperature() }
     }
 
-    pub fn clear_faults(&mut self) {
-        unsafe {
-            self.handle.ClearFaults();
-        }
+    pub fn clear_faults(&mut self) -> CANError {
+        unsafe { self.handle.ClearFaults() }
     }
 
-    pub fn burn_flash(&mut self) {
-        unsafe {
-            self.handle.BurnFlash();
-        }
+    pub fn burn_flash(&mut self) -> CANError {
+        unsafe { self.handle.BurnFlash() }
     }
 
-    pub fn set_CAN_timeout(&mut self, millis: i32) {
-        unsafe {
-            self.handle.SetCANTimeout(millis);
-        }
+    pub fn set_CAN_timeout(&mut self, millis: i32) -> CANError {
+        unsafe { self.handle.SetCANTimeout(millis) }
     }
 
-    pub fn enable_soft_limit(&mut self, direction: SoftLimitDirection, enable: bool) {
-        unsafe {
-            self.handle.EnableSoftLimit(direction, enable);
-        }
+    pub fn enable_soft_limit(&mut self, direction: SoftLimitDirection, enable: bool) -> CANError {
+        unsafe { self.handle.EnableSoftLimit(direction, enable) }
     }
 
-    pub fn is_soft_limit_enabled(&mut self, direction: SoftLimitDirection) {
-        unsafe {
-            self.handle.IsSoftLimitEnabled(direction);
-        }
+    pub fn is_soft_limit_enabled(&mut self, direction: SoftLimitDirection) -> bool {
+        unsafe { self.handle.IsSoftLimitEnabled(direction) }
     }
 
-    pub fn set_soft_limit(&mut self, direction: SoftLimitDirection, limit: f64) {
-        unsafe {
-            self.handle.SetSoftLimit(direction, limit);
-        }
+    pub fn set_soft_limit(&mut self, direction: SoftLimitDirection, limit: f64) -> CANError {
+        unsafe { self.handle.SetSoftLimit(direction, limit) }
     }
 
-    pub fn get_soft_limit(&mut self, direction: SoftLimitDirection) {
-        unsafe {
-            self.handle.GetSoftLimit(direction);
-        }
+    pub fn get_soft_limit(&mut self, direction: SoftLimitDirection) -> f64 {
+        unsafe { self.handle.GetSoftLimit(direction) }
     }
 
-    pub fn get_last_error(&mut self) {
-        unsafe {
-            self.handle.GetLastError();
-        }
+    pub fn get_last_error(&mut self) -> CANError {
+        unsafe { self.handle.GetLastError() }
     }
 }
